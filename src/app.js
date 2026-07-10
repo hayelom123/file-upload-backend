@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import router from "./routes/index.js";
+import fileUploadRoutes from "./routes/file_upload_route.js";
 
 const app = express();
 const PORT = 3000;
@@ -15,18 +16,19 @@ const __publicDir = path.join(__dirname, "public");
 // console.log(__dirname);
 // console.log(__publicDir);
 
-// Serve static files from the public directory
-app.use(express.static(__publicDir));
-
 app.use(
-  express.raw({
-    type: "application/octet-stream",
-    limit: "20mb",
-  }),
+  "/api/file-upload",
+  // express.raw({
+  //   type: "application/octet-stream",
+  //   limit: "10mb",
+  // }),
+  fileUploadRoutes,
 );
 
+// Serve static files from the public directory
+app.use(express.static(__publicDir));
 // Middleware to parse JSON requests
-app.use(express.json());
+// app.use(express.json());
 
 // Use the router for handling routes
 app.use("/api", router);

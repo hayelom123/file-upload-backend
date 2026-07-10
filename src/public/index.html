@@ -50,10 +50,66 @@
     </style>
   </head>
   <body>
-    <form action="/upload" method="post" enctype="multipart/form-data">
+    <form
+      onsubmit="onSubmit.call(this, event)"
+        event.preventDefault();
+        uploadFile(this.file.files[0]);
+      "
+    >
       <h1>File Upload</h1>
       <input type="file" name="file" />
       <button type="submit">Upload</button>
     </form>
+
+    <script>
+      async function onSubmit(event) {
+        event.preventDefault();
+        const file = this.file.files[0];
+        if (!file) {
+          alert("Please select a file to upload.");
+          return;
+        }
+        try {
+          await uploadFile(file);
+          alert("File uploaded successfully!");
+        } catch (error) {
+          console.error("Error uploading file:", error);
+          alert("Error uploading file. Please try again.");
+        }
+      }
+
+      async function uploadFile(file) {
+        const uploadId = crypto.randomUUID(); // Unique ID for this upload session
+        const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+        for (let i = 0; i < totalChunks; i++) {
+          const start = i * CHUNK_SIZE;
+          const end = Math.min(start + CHUNK_SIZE, file.size);
+          const chunk = file.slice(start, end);
+          console.log(`Uploading chunk ${i + 1} of ${totalChunks}...`);
+
+          // 2. Send the chunk as a raw binary payload
+          const response = await fetch(`/api/file-upload/upload/${uploadId}/chunk/${i}`, {
+            method: "POST",
+            body: chunk,
+            headers: {
+              "Content-Type": "application/octet-stream",
+         
+              "x-total-chunks": totalChunks,
+              "x-file-name":  encodeURIComponent(file.name), 
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to upload chunk ${i + 1}`);
+          }
+          const result = await response.json();
+          if (result.completed) {
+            console.log("File fully uploaded and merged successfully!");
+          }
+        }
+      }
+    </script>
   </body>
 </html>

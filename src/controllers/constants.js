@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const CHUNK_DIR = path.join(__dirname, "../uploads/temp");
+const CHUNK_DIR = path.join(__dirname, "../uploads/chunks");
 const FILE_DIR = path.join(__dirname, "../uploads/files");
 
 // Ensure the upload directory exists

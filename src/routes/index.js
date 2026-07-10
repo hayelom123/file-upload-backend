@@ -1,7 +1,7 @@
 import express from "express";
 
 //import routes
-import fileUploadRoutes from "./file_upload_route.js";
+// import fileUploadRoutes from "./file_upload_route.js";
 
 const router = express.Router();
 
@@ -13,10 +13,10 @@ const routes = [
     },
   },
 
-  {
-    path: "/file-upload",
-    route: fileUploadRoutes,
-  },
+  //   {
+  //     path: "/file-upload",
+  //     route: fileUploadRoutes,
+  //   },
 ];
 
 routes.forEach((route) => {
