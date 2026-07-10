@@ -47,17 +47,31 @@
         cursor: pointer;
         border-radius: 8px;
       }
+      .progress-container {
+        width: 100%;
+        background-color: #eee;
+        border-radius: 10px;
+        height: 20px;
+      }
+      .progress-bar {
+        width: 0%;
+        height: 100%;
+        background-color: #4caf50;
+        border-radius: 10px;
+        text-align: center;
+        color: white;
+        font-size: 12px;
+        line-height: 20px;
+      }
     </style>
   </head>
   <body>
-    <form
-      onsubmit="onSubmit.call(this, event)"
-        event.preventDefault();
-        uploadFile(this.file.files[0]);
-      "
-    >
+    <form onsubmit="onSubmit.call(this, event)">
       <h1>File Upload</h1>
       <input type="file" name="file" />
+      <div class="progress-container">
+        <div class="progress-bar">0%</div>
+      </div>
       <button type="submit">Upload</button>
     </form>
 
@@ -71,7 +85,6 @@
         }
         try {
           await uploadFile(file);
-          alert("File uploaded successfully!");
         } catch (error) {
           console.error("Error uploading file:", error);
           alert("Error uploading file. Please try again.");
@@ -80,7 +93,7 @@
 
       async function uploadFile(file) {
         const uploadId = crypto.randomUUID(); // Unique ID for this upload session
-        const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+        const CHUNK_SIZE = 1024 * 1024 * 2; // 1MB chunks
         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
         for (let i = 0; i < totalChunks; i++) {
@@ -90,16 +103,18 @@
           console.log(`Uploading chunk ${i + 1} of ${totalChunks}...`);
 
           // 2. Send the chunk as a raw binary payload
-          const response = await fetch(`/api/file-upload/upload/${uploadId}/chunk/${i}`, {
-            method: "POST",
-            body: chunk,
-            headers: {
-              "Content-Type": "application/octet-stream",
-         
-              "x-total-chunks": totalChunks,
-              "x-file-name":  encodeURIComponent(file.name), 
+          const response = await fetch(
+            `/api/file-upload/upload/${uploadId}/chunk/${i}`,
+            {
+              method: "POST",
+              body: chunk,
+              headers: {
+                "Content-Type": "application/octet-stream",
+                "x-total-chunks": totalChunks,
+                "x-file-name": encodeURIComponent(file.name),
+              },
             },
-          });
+          );
 
           if (!response.ok) {
             throw new Error(`Failed to upload chunk ${i + 1}`);
@@ -107,9 +122,23 @@
           const result = await response.json();
           if (result.completed) {
             console.log("File fully uploaded and merged successfully!");
+            updateProgressBar(100); // Update progress bar to 100% after all chunks are uploaded
+            alert("File uploaded successfully!");
+            return; // Exit the loop if the file is fully uploaded and merged
           }
+
+          // Update progress after each chunk
+          const percentage = Math.round(((i + 1) / totalChunks) * 100); // Calculate percentage based on completed chunks
+          updateProgressBar(percentage); // Update progress bar to 100% after all chunks are uploaded
+          await wait(1000); // Wait for a second before merging
         }
       }
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const updateProgressBar = (percentage) => {
+        const progressBar = document.querySelector(".progress-bar");
+        progressBar.style.width = `${percentage}%`;
+        progressBar.textContent = `${percentage}%`;
+      };
     </script>
   </body>
 </html>

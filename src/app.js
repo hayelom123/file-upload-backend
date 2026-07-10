@@ -16,19 +16,20 @@ const __publicDir = path.join(__dirname, "public");
 // console.log(__dirname);
 // console.log(__publicDir);
 
+// JSON routes
+app.use(express.json());
+
+// Form routes
+app.use(express.urlencoded({ extended: true }));
+
 app.use(
   "/api/file-upload",
-  // express.raw({
-  //   type: "application/octet-stream",
-  //   limit: "10mb",
-  // }),
+
   fileUploadRoutes,
 );
 
 // Serve static files from the public directory
 app.use(express.static(__publicDir));
-// Middleware to parse JSON requests
-// app.use(express.json());
 
 // Use the router for handling routes
 app.use("/api", router);
