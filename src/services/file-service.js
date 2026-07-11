@@ -34,64 +34,6 @@ const uploadChunkService = async ({
   };
 };
 
-const mergeChunksService1 = async ({ uploadId, fileName, totalChunks }) => {
-  const uploadDir = path.join(CHUNK_DIR, uploadId);
-
-  // Ensure upload exists
-  await fs.promises.access(uploadDir);
-
-  // Ensure final directory exists
-  await fs.promises.mkdir(FILE_DIR, {
-    recursive: true,
-  });
-
-  const finalPath = path.join(FILE_DIR, fileName);
-
-  // Remove old file if it exists
-  await fs.promises.rm(finalPath, {
-    force: true,
-  });
-
-  // Create the final write stream
-  const writeStream = fs.createWriteStream(finalPath);
-
-  try {
-    for (let i = 0; i < totalChunks; i++) {
-      const chunkPath = path.join(uploadDir, `${i}.part`);
-
-      // Ensure chunk exists
-      await fs.promises.access(chunkPath);
-
-      // Wait until this chunk finishes writing
-      await pipeline(fs.createReadStream(chunkPath), writeStream, {
-        end: false,
-      });
-    }
-
-    // Close final file
-    await new Promise((resolve, reject) => {
-      writeStream.end((err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
-    // Clean up the chunk directory after merging
-    await fs.promises.rm(uploadDir, {
-      recursive: true,
-      force: true,
-    });
-
-    return {
-      success: true,
-      filePath: finalPath,
-      completed: true,
-    };
-  } catch (err) {
-    writeStream.destroy();
-
-    throw err;
-  }
-};
 const mergeChunksService = async ({ uploadId, fileName, totalChunks }) => {
   const uploadDir = path.join(CHUNK_DIR, uploadId);
 
