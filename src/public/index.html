@@ -156,7 +156,7 @@
           // Update progress after each chunk
           const percentage = Math.round(((i + 1) / totalChunks) * 100); // Calculate percentage based on completed chunks
           updateProgressBar(percentage); // Update progress bar to 100% after all chunks are uploaded
-          await wait(1000); // Wait for a second before merging
+          // await wait(1000); // Wait for a second before merging
         }
       }
       const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
