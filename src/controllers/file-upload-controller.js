@@ -35,7 +35,7 @@ const initFileUploadController = catchAsync(async (req, res) => {
     fileName: fileName,
     totalChunks: totalChunks,
   });
-
+  console.log("Initialized upload for file:", result);
   res.status(201).json(result);
 });
 const uploadChunckController = catchAsync(async (req, res) => {
