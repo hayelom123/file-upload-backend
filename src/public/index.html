@@ -101,9 +101,24 @@
       }
 
       async function uploadFile(file) {
-        const uploadId = crypto.randomUUID(); // Unique ID for this upload session
+        // const uploadId = crypto.randomUUID(); // Unique ID for this upload session
         const CHUNK_SIZE = 1024 * 1024 * 2; // 1MB chunks
         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+        const initResponse = await fetch("/api/file-upload/upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-file-name": encodeURIComponent(file.name),
+            "x-total-chunks": totalChunks,
+          },
+        });
+
+        const initResult = await initResponse.json();
+        const uploadId = initResult.uploadId;
+        if (!uploadId) {
+          throw new Error("Failed to initialize file upload.");
+        }
 
         for (let i = 0; i < totalChunks; i++) {
           const start = i * CHUNK_SIZE;

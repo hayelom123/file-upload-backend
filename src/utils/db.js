@@ -22,6 +22,11 @@ const insertToDb = ({ fileName, totalChunks }) => {
   };
   return uploadId;
 };
+
+const getFileByUploadId = (uploadId) => {
+  return db[uploadId] || null;
+};
+
 const deleteFromDb = (uploadId) => {
   delete db[uploadId];
 };
@@ -64,11 +69,11 @@ const updateUploadProgress = (uploadId, receivedChunks) => {
 };
 
 export {
-  getUploadStatus,
-  updateUploadStatus,
   insertToDb,
+  getFileByUploadId,
   deleteFromDb,
   updateDb,
+  updateUploadStatus,
   getDb,
   getUploadStatus,
   updateUploadProgress,
