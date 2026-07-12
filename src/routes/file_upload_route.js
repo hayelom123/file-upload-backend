@@ -44,6 +44,7 @@ router.post(
   fileController.uploadChunckController,
 );
 
+router.get("/files", fileController.getAllFiles);
 router.post("/upload", fileController.initFileUploadController);
 router.post("/upload/pause", fileController.pauseUploadController);
 router.post("/upload/resume", fileController.resumeUploadController);

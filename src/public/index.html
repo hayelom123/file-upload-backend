@@ -149,6 +149,7 @@
             updateProgressBar(100); // Update progress bar to 100% after all chunks are uploaded
             await wait(1000); // Wait for a second before merging
             alert("File uploaded successfully!");
+            window.navigation.navigate("/files.html");
             return; // Exit the loop if the file is fully uploaded and merged
           }
 

@@ -143,10 +143,18 @@ const mergeChunksService = async ({
 const getDbService = async () => {
   return getDb();
 };
+const getFileByUploadIdService = async ({ uploadId }) => {
+  const fileData = getFileByUploadId(uploadId);
+  if (!fileData) {
+    throw new Error("Upload ID not found");
+  }
+  return fileData;
+};
 export {
   intitFileUploadService,
   getUploadStatusService,
   uploadChunkService,
   mergeChunksService,
   getDbService,
+  getFileByUploadIdService,
 };

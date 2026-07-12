@@ -7,6 +7,7 @@ import {
   uploadChunkService,
   mergeChunksService,
   getDbService,
+  getFileByUploadIdService,
 } from "../services/file-service.js";
 
 const initFileUploadController = catchAsync(async (req, res) => {
@@ -103,8 +104,37 @@ const mergeChunksController = catchAsync(async (req, res) => {
 });
 
 const downloadFileController = catchAsync(async (req, res) => {
-  // Handle file download logic here
-  res.send("File downloaded successfully!");
+  const fileId = req.params.fileId;
+  const fileData = await getFileByUploadIdService({ uploadId: fileId });
+  if (!fileData) {
+    return res.status(404).json({ error: "File not found" });
+  }
+  const { fileName } = fileData;
+  const filePath = path.join(FILE_DIR, fileName);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: "File not found" });
+  }
+  res.sendFile(filePath);
+});
+
+const getAllFiles = catchAsync(async (req, res) => {
+  const files = await getDbService();
+  console.log("Retrieved all files from database:", files);
+  res.send(files);
+});
+
+const displayFile = catchAsync(async (req, res) => {
+  const fileId = req.params.fileId;
+  const fileData = await getFileByUploadIdService({ uploadId: fileId });
+  if (!fileData) {
+    return res.status(404).json({ error: "File not found" });
+  }
+  const { fileName } = fileData;
+  const filePath = path.join(FILE_DIR, fileName);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: "File not found" });
+  }
+  res.sendFile(filePath);
 });
 
 export {
@@ -115,4 +145,6 @@ export {
   resumeUploadController,
   mergeChunksController,
   downloadFileController,
+  getAllFiles,
+  displayFile,
 };
