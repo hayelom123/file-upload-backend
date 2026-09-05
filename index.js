@@ -2,9 +2,10 @@ import app from "./src/app.js";
 
 const PORT = process.env.PORT || 3000;
 
+console.log(process.env.PORT);
 // Start the server
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `File upload backend server is running on http://localhost:${PORT}`,
   );
